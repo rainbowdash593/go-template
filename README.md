@@ -1,24 +1,24 @@
-##Description:
+## Description:
 - Go clean architecture template
 - GORM ORM
 - Gin HTTP Server
 
-##Requirements:
+## Requirements:
 - docker
 - docker-compose
 
-##Start application:
+## Start application:
 
 1. Copy environment variables
 
 
     cp .env.example .env.local
-2. Run docker-compose command
+3. Run docker-compose command
 
 
     docker-compose -f docker/docker-compose-local.yml up --build
 
-##Run in debug mode:
+## Run in debug mode:
 1. Check `GOARCH` variable. It should be `arm64` for apple m1 chips
 2. Run docker-compose command
 
