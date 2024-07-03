@@ -10,13 +10,11 @@ COPY --from=modules /go/pkg /go/pkg
 COPY ../.. /app
 WORKDIR /app
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
-    go build -tags migrate -o /bin/main ./cmd/main.go && \
-    go build -tags migrate -o /bin/migrator ./cmd/migrator.go
+    go build -tags migrate -o /bin/main ./cmd/main.go
 
 # Step 3: Final
 FROM alpine
 COPY --from=builder /app/config /app/config
 COPY --from=builder /bin/main /app/main
-COPY --from=builder /bin/migrator /app/migrator
 WORKDIR /app
 CMD ["/main"]

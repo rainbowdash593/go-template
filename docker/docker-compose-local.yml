@@ -12,15 +12,17 @@ services:
       APP_ENV: "LOCAL"
     env_file:
       - ../.env.local
-    entrypoint: sh -c "./migrator && ./main"
+    entrypoint: sh -c "./main"
     ports:
       - "8080:8080"
     depends_on:
       postgres-users-service:
         condition: service_healthy
+      users-service-migrate:
+        condition: service_completed_successfully
 
   postgres-users-service:
-    container_name: database-users-service
+    container_name: postgres-users-service
     image: postgres:15.2
     restart: always
     volumes:
@@ -30,12 +32,25 @@ services:
       POSTGRES_PASSWORD: 'pass'
       POSTGRES_DB: 'users-service-db'
     ports:
-      - "5432:5432"
+      - "5433:5432"
     healthcheck:
       test: [ "CMD", "pg_isready", "-U", "postgres" ]
       interval: 5s
       timeout: 5s
       retries: 5
+
+  users-service-migrate:
+    image: arigaio/atlas:latest
+    command: >
+      migrate apply
+      --url postgres://user:pass@postgres-users-service:5432/users-service-db?sslmode=disable
+    env_file:
+      - ../.env.local
+    volumes:
+      - ../migrations/:/migrations
+    depends_on:
+      postgres-users-service:
+        condition: service_healthy
 
 volumes:
   users-service-data:
